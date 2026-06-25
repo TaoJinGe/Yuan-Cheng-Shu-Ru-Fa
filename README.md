@@ -61,7 +61,7 @@ data/records/
 Windows 电脑双击打开：
 
 ```txt
-dist/desktop/voice-bridge-client.exe
+dist/server/static/download/voice-bridge-client.exe
 ```
 
 手机不用安装 App，浏览器打开：
@@ -174,7 +174,7 @@ https://srf.cccz.cc
 双击：
 
 ```txt
-dist/desktop/voice-bridge-client.exe
+dist/server/static/download/voice-bridge-client.exe
 ```
 
 它会打开一个小窗口，不再弹 cmd。填写：
@@ -232,7 +232,7 @@ Windows GUI 客户端：
 
 ```powershell
 cd desktop-client
-go build -ldflags="-H windowsgui" -o ..\dist\desktop\voice-bridge-client.exe .
+go build -ldflags="-H windowsgui" -o ..\dist\server\static\download\voice-bridge-client.exe .
 ```
 
 ## 常见问题

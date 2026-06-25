@@ -10,10 +10,12 @@ import (
 )
 
 type Config struct {
-	ServerURL string    `json:"serverUrl"`
-	Token     string    `json:"token"`
-	UserID    string    `json:"userId"`
-	ExpiresAt time.Time `json:"expiresAt"`
+	ServerURL        string    `json:"serverUrl"`
+	Token            string    `json:"token"`
+	UserID           string    `json:"userId"`
+	ExpiresAt        time.Time `json:"expiresAt"`
+	RememberPassword bool      `json:"rememberPassword"`
+	PasswordSecret   string    `json:"passwordSecret"`
 }
 
 func Load() (Config, error) {

@@ -18,15 +18,15 @@ FLOW_ID：AUTH_LOGIN_001
 功能名称：用户登录并获取 token
 入口页面：手机网页登录页 /，Windows 客户端登录窗口
 触发点：登录按钮或客户端 token 自动登录
-前端文件：/server/static/app.js、/desktop-client/internal/ui/run.go、/desktop-client/internal/client/api.go
-前端函数或事件：手机端 login，桌面端 login
+前端文件：/server/static/app.js、/desktop-client/internal/ui/run.go、/desktop-client/internal/client/api.go、/desktop-client/internal/config/password_windows.go
+前端函数或事件：手机端 login，桌面端 login，记住密码（本机）复选框
 API/后端入口：POST /api/login
 后端核心文件：/server/internal/web/handlers.go、/server/internal/auth/store.go、/server/internal/auth/users.go、/server/internal/auth/sessions.go
-数据影响：SQLite app.db users 表只读、sessions 表写入和校验
-状态变化：生成 24 小时或 30 天 token，客户端保存 token，服务端重启后仍可从 SQLite 校验未过期 token
+数据影响：SQLite app.db users 表只读、sessions 表写入和校验；Windows 客户端本机 config.json 可保存 DPAPI 加密后的密码密文
+状态变化：生成 24 小时或 30 天 token，客户端保存 token，服务端重启后仍可从 SQLite 校验未过期 token；用户勾选记住密码（本机）后，下次打开客户端自动填入密码，不上传保存密码设置
 关联功能：AUTH_REGISTER_001、PRESENCE_SYNC_001、TEXT_SEND_001
 风险等级：中
-验证方式：勾选和不勾选 30 天免登录后检查 token 过期时间和本地保存行为
+验证方式：勾选和不勾选 30 天免登录后检查 token 过期时间；勾选记住密码（本机）登录后重启客户端应自动填入密码，取消勾选并登录后应清除本机密码密文
 
 FLOW_ID：AUTH_LOGOUT_001
 功能名称：用户退出登录并清理 token

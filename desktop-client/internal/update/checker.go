@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const CurrentVersion = "1.1.4"
+const CurrentVersion = "1.1.7"
 
 type Info struct {
 	Version     string `json:"version"`

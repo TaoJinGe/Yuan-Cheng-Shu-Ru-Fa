@@ -19,6 +19,7 @@ type windowState struct {
 	userEdit   *walk.LineEdit
 	passEdit   *walk.LineEdit
 	remember   *walk.CheckBox
+	savePass   *walk.CheckBox
 	status     *walk.Label
 	loginBtn   *walk.PushButton
 }
@@ -58,11 +59,21 @@ func (w *windowState) build() error {
 		Font:     Font{Family: "Microsoft YaHei UI", PointSize: 10},
 		Layout:   VBox{Margins: Margins{Left: 18, Top: 16, Right: 18, Bottom: 16}, Spacing: 9},
 		Children: []Widget{
-			Label{
-				Text:      "远程语音输入",
-				Font:      Font{Family: "Microsoft YaHei UI", PointSize: 13, Bold: true},
-				MinSize:   Size{Height: 24},
-				TextColor: walk.RGB(23, 32, 38),
+			Composite{
+				Layout: HBox{MarginsZero: true, Spacing: 8},
+				Children: []Widget{
+					Label{
+						Text:      "远程语音输入",
+						Font:      Font{Family: "Microsoft YaHei UI", PointSize: 13, Bold: true},
+						MinSize:   Size{Height: 32},
+						TextColor: walk.RGB(23, 32, 38),
+					},
+					HSpacer{},
+					PushButton{Text: "注册", MinSize: Size{Width: 86, Height: 32}, OnClicked: w.register},
+					PushButton{Text: "检查更新", MinSize: Size{Width: 96, Height: 32}, OnClicked: func() {
+						w.checkUpdate(true)
+					}},
+				},
 			},
 			Label{Text: "服务器 WebSocket 地址", TextColor: walk.RGB(80, 96, 106)},
 			LineEdit{
@@ -83,7 +94,13 @@ func (w *windowState) build() error {
 				CueBanner:    "请输入密码",
 				MinSize:      Size{Height: 34},
 			},
-			CheckBox{AssignTo: &w.remember, Text: "30 天免登录", Checked: true, MinSize: Size{Height: 28}},
+			Composite{
+				Layout: HBox{MarginsZero: true, Spacing: 12},
+				Children: []Widget{
+					CheckBox{AssignTo: &w.remember, Text: "30 天免登录", Checked: true, MinSize: Size{Height: 28}},
+					CheckBox{AssignTo: &w.savePass, Text: "记住密码（本机）", MinSize: Size{Height: 28}},
+				},
+			},
 			Composite{
 				Layout: HBox{MarginsZero: true, Spacing: 8},
 				Children: []Widget{
@@ -93,12 +110,8 @@ func (w *windowState) build() error {
 						MinSize:   Size{Height: 38},
 						OnClicked: w.login,
 					},
-					PushButton{Text: "注册", MinSize: Size{Height: 38}, OnClicked: w.register},
 					PushButton{Text: "重连", MinSize: Size{Height: 38}, OnClicked: w.reconnect},
 					PushButton{Text: "退出登录", MinSize: Size{Height: 38}, OnClicked: w.logout},
-					PushButton{Text: "检查更新", MinSize: Size{Height: 38}, OnClicked: func() {
-						w.checkUpdate(true)
-					}},
 				},
 			},
 			Label{
@@ -121,6 +134,10 @@ func (w *windowState) loadConfig() {
 	cfg := w.app.Config()
 	w.serverEdit.SetText(cfg.ServerURL)
 	w.userEdit.SetText(cfg.UserID)
+	if password := cfg.SavedPassword(); password != "" {
+		w.passEdit.SetText(password)
+		w.savePass.SetChecked(true)
+	}
 }
 
 func (w *windowState) login() {
@@ -138,10 +155,11 @@ func (w *windowState) doAuth(register bool) {
 		w.setStatus("正在登录...")
 	}
 	input := app.LoginInput{
-		ServerURL: w.serverEdit.Text(),
-		Username:  w.userEdit.Text(),
-		Password:  w.passEdit.Text(),
-		Remember:  w.remember.Checked(),
+		ServerURL:        w.serverEdit.Text(),
+		Username:         w.userEdit.Text(),
+		Password:         w.passEdit.Text(),
+		Remember:         w.remember.Checked(),
+		RememberPassword: w.savePass.Checked(),
 	}
 	var err error
 	if register {
@@ -153,7 +171,9 @@ func (w *windowState) doAuth(register bool) {
 		w.setStatus("登录失败：" + err.Error())
 		return
 	}
-	w.passEdit.SetText("")
+	if !input.RememberPassword {
+		w.passEdit.SetText("")
+	}
 	w.afterLogin()
 }
 

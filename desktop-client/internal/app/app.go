@@ -17,10 +17,11 @@ type State struct {
 }
 
 type LoginInput struct {
-	ServerURL string
-	Username  string
-	Password  string
-	Remember  bool
+	ServerURL        string
+	Username         string
+	Password         string
+	Remember         bool
+	RememberPassword bool
 }
 
 func New(defaultServer string) (*State, error) {
@@ -101,6 +102,7 @@ func (s *State) auth(input LoginInput, register bool) error {
 	s.mu.Lock()
 	s.cfg.ServerURL = input.ServerURL
 	s.cfg.SetSession(session)
+	s.cfg.SetSavedPassword(input.Password, input.RememberPassword)
 	err = localconfig.Save(s.cfg)
 	s.mu.Unlock()
 	return err

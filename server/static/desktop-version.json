@@ -1,5 +1,5 @@
 {
-  "version": "1.1.4",
+  "version": "1.1.7",
   "downloadUrl": "https://srf.cccz.cc/download/voice-bridge-client.exe",
-  "notes": "恢复稳定的 Ctrl+V 模拟方式，修复无法发送粘贴按键的问题。"
+  "notes": "优化 Windows 客户端按钮布局：注册和检查更新移到窗口顶部，底部只保留登录、重连和退出登录。"
 }

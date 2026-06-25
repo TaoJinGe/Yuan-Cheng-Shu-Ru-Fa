@@ -6,8 +6,11 @@ go.sum —— 客户端依赖校验文件，只负责锁定依赖校验值（修
 app.manifest —— Windows 程序清单文件，只负责启用 Common Controls v6 和普通权限启动（修改影响 GUI 启动兼容性）
 app.ico —— Windows 托盘图标文件，只负责窗口和右下角托盘显示（修改影响托盘可见性）
 rsrc.syso —— Windows 资源文件，由 app.manifest 和 app.ico 生成并嵌入 exe（生成资源，AI 不手写修改）
-internal/config/ —— 本地配置模块目录，只负责 config.json 的 token 读写（修改影响 30 天免登录）
-internal/config/config.go —— 本地配置读写模块，只负责保存和清理 token 元数据及服务器地址（修改影响客户端自动登录，关联 FLOW_ID：AUTH_LOGIN_001、AUTH_LOGOUT_001）
+internal/config/ —— 本地配置模块目录，只负责 config.json 的 token 和本机加密密码读写（修改影响 30 天免登录和记住密码）
+internal/config/config.go —— 本地配置读写模块，只负责保存和清理 token、本机密码密文元数据及服务器地址（修改影响客户端自动登录，关联 FLOW_ID：AUTH_LOGIN_001、AUTH_LOGOUT_001）
+internal/config/password.go —— 本机密码配置模块，只负责记住密码字段的保存和读取编排（修改影响本机记住密码，关联 FLOW_ID：AUTH_LOGIN_001）
+internal/config/password_windows.go —— Windows DPAPI 密码模块，只负责本机密码加密和解密（修改影响本机记住密码安全性，关联 FLOW_ID：AUTH_LOGIN_001）
+internal/config/password_other.go —— 非 Windows 密码占位模块，只负责阻止非 Windows 保存密码误用（修改影响跨平台构建）
 internal/client/ —— 客户端联网模块目录，只负责登录 API 和 WebSocket 消息处理（修改影响连接状态与收文）
 internal/client/api.go —— HTTP API 客户端，只负责注册、登录、退出和 token 校验请求（修改影响登录链路，关联 FLOW_ID：AUTH_REGISTER_001、AUTH_LOGIN_001、AUTH_LOGOUT_001）
 internal/client/ws.go —— WebSocket 客户端，只负责注册 desktop、接收 presence 和 insert_text（修改影响状态灯和插入链路，关联 FLOW_ID：PRESENCE_SYNC_001、TEXT_SEND_001）
