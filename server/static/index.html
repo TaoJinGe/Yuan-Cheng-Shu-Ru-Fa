@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>远程语音输入</title>
+  <link rel="icon" href="./favicon.ico">
+  <link rel="stylesheet" href="./style.css?v=20260624">
+</head>
+<body>
+  <main class="page">
+    <section id="loginPanel" class="login-view">
+      <div class="login-box">
+        <h1>远程语音输入</h1>
+        <label>
+          账号
+          <input id="usernameInput" autocomplete="username" placeholder="请输入账号">
+        </label>
+        <label>
+          密码
+          <input id="passwordInput" type="password" autocomplete="current-password" placeholder="请输入密码">
+        </label>
+        <label class="check">
+          <input id="rememberInput" type="checkbox">
+          <span>30 天免登录</span>
+        </label>
+        <button id="loginButton" type="button">登录</button>
+        <button id="registerButton" class="secondary" type="button">注册</button>
+        <p id="loginHint" class="hint">未登录</p>
+      </div>
+    </section>
+
+    <section id="appPanel" class="input-view" hidden>
+      <header class="status-bar">
+        <div class="status">
+          <span id="statusDot" class="dot red"></span>
+          <span id="statusText">未连接</span>
+        </div>
+        <button id="logoutButton" class="link-button" type="button">退出</button>
+      </header>
+
+      <textarea id="textInput" class="voice-box" placeholder="点这里，用手机输入法语音转文字"></textarea>
+
+      <button id="sendButton" class="send-button" type="button">发送到电脑</button>
+      <button id="clearButton" class="clear-button" type="button">清空</button>
+      <p id="sendHint" class="hint"></p>
+    </section>
+  </main>
+  <script src="./app.js?v=20260624"></script>
+</body>
+</html>

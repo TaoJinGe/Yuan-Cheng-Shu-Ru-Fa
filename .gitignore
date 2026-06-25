@@ -1,0 +1,30 @@
+# Runtime data
+/data/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Build outputs
+/dist/
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+
+# Temporary and backup files
+*~
+*.tmp
+*.temp
+*.log
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Go build cache artifacts
+coverage.out
