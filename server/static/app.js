@@ -5,6 +5,8 @@ const state = {
   socket: null,
   desktopOnline: false,
   reconnectTimer: 0,
+  downTimer: 0,
+  pingTimer: 0,
   reconnectAttempts: 0,
   pendingSendCount: 0,
   undoText: "",
@@ -16,6 +18,11 @@ const isFilePreview = location.protocol === "file:";
 function init() {
   updateViewportHeight();
   window.addEventListener("resize", updateViewportHeight);
+  window.addEventListener("focus", resumeSocket);
+  window.addEventListener("pageshow", resumeSocket);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) resumeSocket();
+  });
   if (window.visualViewport) {
     window.visualViewport.addEventListener("resize", updateViewportHeight);
     window.visualViewport.addEventListener("scroll", updateViewportHeight);
@@ -24,6 +31,7 @@ function init() {
   $("registerButton").addEventListener("click", registerAccount);
   $("logoutButton").addEventListener("click", logout);
   bindActionButton($("undoButton"), undoText);
+  bindActionButton($("reconnectButton"), () => forceReconnect(true));
   bindActionButton($("sendButton"), sendText);
   if (isFilePreview) {
     showLogin();
@@ -41,59 +49,6 @@ function init() {
 function updateViewportHeight() {
   const height = window.visualViewport ? window.visualViewport.height : window.innerHeight;
   document.documentElement.style.setProperty("--app-height", `${Math.round(height)}px`);
-}
-
-function bindActionButton(button, action) {
-  let handledByPointer = false;
-  let suppressClickUntil = 0;
-  button.addEventListener("pointerdown", (event) => {
-    button.classList.add("is-pressing");
-    if (document.activeElement === $("textInput")) {
-      handledByPointer = true;
-      event.preventDefault();
-    }
-  });
-  button.addEventListener("pointerup", (event) => {
-    if (!handledByPointer) return;
-    handledByPointer = false;
-    suppressClickUntil = Date.now() + 700;
-    event.preventDefault();
-    button.classList.remove("is-pressing");
-    flashButton(button);
-    action();
-  });
-  button.addEventListener("pointercancel", () => {
-    handledByPointer = false;
-    button.classList.remove("is-pressing");
-  });
-  button.addEventListener("click", (event) => {
-    button.classList.remove("is-pressing");
-    if (Date.now() < suppressClickUntil) {
-      event.preventDefault();
-      return;
-    }
-    flashButton(button);
-    action();
-  });
-}
-
-function flashButton(button) {
-  button.classList.remove("is-flashing");
-  void button.offsetWidth;
-  button.classList.add("is-flashing");
-  setTimeout(() => button.classList.remove("is-flashing"), 420);
-}
-
-function setTextInput(text) {
-  const input = $("textInput");
-  input.value = text;
-  input.setSelectionRange(text.length, text.length);
-}
-
-function focusTextInput() {
-  requestAnimationFrame(() => {
-    $("textInput").focus({ preventScroll: true });
-  });
 }
 
 function hasValidToken() {
@@ -175,6 +130,7 @@ function saveSession(session) {
 
 function clearSession() {
   if (state.socket) state.socket.close();
+  stopPing();
   ["token", "expiresAt", "userId"].forEach((key) => localStorage.removeItem(key));
   state.token = "";
   state.expiresAt = "";
@@ -204,8 +160,10 @@ function connectSocket() {
   state.socket = new WebSocket(`${proto}//${location.host}/ws`);
   state.socket.onopen = () => {
     state.reconnectAttempts = 0;
+    clearDownTimer();
     $("sendHint").textContent = "";
     sendSocket({ type: "web_join", token: state.token });
+    startPing();
   };
   state.socket.onmessage = (event) => {
     const msg = JSON.parse(event.data);
@@ -218,9 +176,29 @@ function connectSocket() {
     }
   };
   state.socket.onclose = () => {
-    setStatus("server_down");
+    stopPing();
+    delayServerDown();
     scheduleReconnect();
   };
+}
+
+function resumeSocket() {
+  if (!hasValidToken() || isFilePreview) return;
+  forceReconnect(false);
+}
+
+function forceReconnect(showHint) {
+  if (!hasValidToken() || isFilePreview) return;
+  clearDownTimer();
+  stopPing();
+  if (state.socket) {
+    state.socket.onclose = null;
+    state.socket.close();
+    state.socket = null;
+  }
+  state.reconnectAttempts = 0;
+  if (showHint) $("sendHint").textContent = "正在重新连接...";
+  connectSocket();
 }
 
 function scheduleReconnect() {
@@ -230,9 +208,31 @@ function scheduleReconnect() {
     $("sendHint").textContent = "服务器断开，请先双击启动本地服务.cmd，再刷新页面";
     return;
   }
-  const delay = Math.min(1500 * state.reconnectAttempts, 10000);
-  $("sendHint").textContent = `服务器断开，${Math.round(delay / 1000)} 秒后重连`;
+  const delay = Math.min(250 * state.reconnectAttempts, 3000);
+  if (state.reconnectAttempts > 2) $("sendHint").textContent = `正在重连...`;
   state.reconnectTimer = setTimeout(connectSocket, delay);
+}
+
+function delayServerDown() {
+  clearDownTimer();
+  state.downTimer = setTimeout(() => setStatus("server_down"), 5000);
+}
+
+function clearDownTimer() {
+  if (!state.downTimer) return;
+  clearTimeout(state.downTimer);
+  state.downTimer = 0;
+}
+
+function startPing() {
+  stopPing();
+  state.pingTimer = setInterval(() => sendSocket({ type: "ping", token: state.token }), 25000);
+}
+
+function stopPing() {
+  if (!state.pingTimer) return;
+  clearInterval(state.pingTimer);
+  state.pingTimer = 0;
 }
 
 function setStatus(status) {

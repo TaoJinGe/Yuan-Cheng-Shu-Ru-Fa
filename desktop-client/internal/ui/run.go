@@ -1,11 +1,14 @@
 package ui
 
 import (
+	"strings"
+
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
 
 	"voice-bridge-client/internal/app"
 	"voice-bridge-client/internal/client"
+	appupdate "voice-bridge-client/internal/update"
 )
 
 type windowState struct {
@@ -33,6 +36,7 @@ func Run(defaultServer string) error {
 		return err
 	}
 	ws.loadConfig()
+	ws.checkUpdate(false)
 	ws.mw.Closing().Attach(func(canceled *bool, reason walk.CloseReason) {
 		*canceled = true
 		ws.mw.Hide()
@@ -91,6 +95,9 @@ func (w *windowState) build() error {
 					},
 					PushButton{Text: "注册", MinSize: Size{Height: 38}, OnClicked: w.register},
 					PushButton{Text: "退出登录", MinSize: Size{Height: 38}, OnClicked: w.logout},
+					PushButton{Text: "检查更新", MinSize: Size{Height: 38}, OnClicked: func() {
+						w.checkUpdate(true)
+					}},
 				},
 			},
 			Label{
@@ -156,6 +163,48 @@ func (w *windowState) afterLogin() {
 		Connected:  w.setConnected,
 		AuthFailed: w.authFailed,
 	})
+}
+
+func (w *windowState) checkUpdate(manual bool) {
+	serverURL := w.app.Config().ServerURL
+	if manual {
+		w.setStatus("正在检查更新...")
+	}
+	go func() {
+		info, ok, err := appupdate.Check(serverURL)
+		if err != nil {
+			if manual {
+				w.mw.Synchronize(func() {
+					w.setStatus("检查更新失败")
+					w.showInfo("检查更新", "连接更新服务器失败，请稍后再试。")
+				})
+			}
+			return
+		}
+		if !ok || info.DownloadURL == "" {
+			if manual {
+				w.mw.Synchronize(func() {
+					w.setStatus("已是最新版")
+					w.showInfo("检查更新", "当前已经是最新版："+appupdate.CurrentVersion)
+				})
+			}
+			return
+		}
+		w.mw.Synchronize(func() {
+			message := "发现新版本：" + info.Version + "\n当前版本：" + appupdate.CurrentVersion
+			if strings.TrimSpace(info.Notes) != "" {
+				message += "\n\n" + info.Notes
+			}
+			message += "\n\n是否下载新版？"
+			if walk.MsgBox(w.mw, "远程语音输入更新", message, walk.MsgBoxYesNo|walk.MsgBoxIconInformation) == 6 {
+				_ = appupdate.OpenDownload(info.DownloadURL)
+			}
+		})
+	}()
+}
+
+func (w *windowState) showInfo(title, message string) {
+	walk.MsgBox(w.mw, title, message, walk.MsgBoxOK|walk.MsgBoxIconInformation)
 }
 
 func (w *windowState) logout() {

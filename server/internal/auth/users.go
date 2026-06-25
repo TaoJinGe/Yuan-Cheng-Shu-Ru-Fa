@@ -58,6 +58,12 @@ func (s *UserStore) init() error {
 			password_hash text not null,
 			created_at text not null
 		);
+		create table if not exists sessions (
+			token text primary key,
+			user_id text not null,
+			expires_at text not null,
+			created_at text not null
+		);
 	`)
 	return err
 }

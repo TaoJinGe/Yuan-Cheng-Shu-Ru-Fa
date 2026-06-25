@@ -145,17 +145,18 @@ button:active {
 
 .status-actions {
   display: flex;
-  gap: 8px;
+  gap: 4px;
   flex-shrink: 0;
 }
 
 .link-button {
   width: auto;
   min-height: 34px;
-  padding: 0 10px;
+  padding: 0 8px;
   color: #50606a;
   background: transparent;
   box-shadow: none;
+  font-size: 14px;
 }
 
 .voice-box {

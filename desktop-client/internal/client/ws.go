@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -47,7 +46,7 @@ func RunDesktopSocket(serverURL, token string, events Events, stop <-chan struct
 				return err
 			}
 			callStatus(events, fmt.Sprintf("服务器断开：%v", err))
-			if waitStop(stop, 3*time.Second) {
+			if waitStop(stop, time.Second) {
 				return nil
 			}
 		}
@@ -64,6 +63,9 @@ func runOnce(serverURL, token string, events Events, stop <-chan struct{}) error
 	if err := ws.WriteJSON(wsMessage{Type: "desktop_join", Token: token}); err != nil {
 		return err
 	}
+	done := make(chan struct{})
+	defer close(done)
+	go keepAlive(ws, stop, done)
 	callStatus(events, "已连接服务器，等待手机端")
 
 	for {
@@ -89,13 +91,35 @@ func runOnce(serverURL, token string, events Events, stop <-chan struct{}) error
 			}
 		case "ack":
 			if raw["ok"] == false {
-				if reason, _ := raw["error"].(string); strings.Contains(reason, "token") {
+				if isAuthAckError(raw) {
 					return ErrAuthExpired
 				}
-				return ErrAuthExpired
+				callStatus(events, "服务器返回错误，正在保持连接")
 			}
 		}
 	}
+}
+
+func keepAlive(ws *websocket.Conn, stop <-chan struct{}, done <-chan struct{}) {
+	ticker := time.NewTicker(25 * time.Second)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-stop:
+			return
+		case <-done:
+			return
+		case <-ticker.C:
+			deadline := time.Now().Add(5 * time.Second)
+			_ = ws.WriteControl(websocket.PingMessage, []byte("ping"), deadline)
+		}
+	}
+}
+
+func isAuthAckError(raw map[string]any) bool {
+	reason, _ := raw["error"].(string)
+	msgType, _ := raw["message_type"].(string)
+	return msgType == "desktop_join" && (reason == "invalid token" || reason == "not joined")
 }
 
 func handlePresence(raw map[string]any, events Events) {

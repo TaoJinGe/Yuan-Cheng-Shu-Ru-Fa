@@ -7,6 +7,7 @@ internal/config/ —— 配置模块目录，只负责服务端端口、SQLite�
 internal/config/config.go —— 配置读取模块，只负责解析 flag 与环境变量（修改影响配置优先级）
 internal/auth/ —— 登录会话模块目录，只负责账号认证和 token 生命周期管理（修改影响认证状态，关联 FLOW_ID：AUTH_REGISTER_001、AUTH_LOGIN_001、AUTH_LOGOUT_001）
 internal/auth/store.go —— 认证编排模块，只负责注册、登录、token 签发、校验和吊销（修改影响登录有效期）
+internal/auth/sessions.go —— SQLite 会话存储模块，只负责 token session 的保存、查询和删除（修改影响 30 天免登录持久性，关联 FLOW_ID：AUTH_LOGIN_001）
 internal/auth/users.go —— SQLite 用户存储模块，只负责 app.db 用户表初始化、写入和账号查询（修改影响账号持久化，关联 FLOW_ID：AUTH_REGISTER_001、AUTH_LOGIN_001）
 internal/records/ —— 文本记录目录，只负责按账号和日期保存手机发送内容（修改影响发送记录）
 internal/records/recorder.go —— 文本记录模块，只负责 records/账号/日期.md 文件追加写入并按发送时间分段（修改影响发送记录，关联 FLOW_ID：TEXT_SEND_001）
@@ -18,5 +19,7 @@ internal/web/handlers.go —— HTTP 路由处理模块，只负责注册、登�
 static/ —— 手机网页静态资源目录，只负责移动端页面资源（修改影响手机端体验）
 static/index.html —— 手机端 HTML 结构，只负责登录页和无配对码输入页两态容器（修改影响移动端布局，关联 FLOW_ID：AUTH_REGISTER_001、AUTH_LOGIN_001、TEXT_SEND_001）
 static/favicon.ico —— 手机网页图标文件，只负责浏览器标签页和避免 favicon 404（修改影响静态资源请求）
+static/desktop-version.json —— 桌面客户端更新信息文件，只负责声明最新版本、下载地址和更新说明（修改影响客户端更新提示，关联 FLOW_ID：DESKTOP_UPDATE_001）
 static/app.js —— 手机端交互脚本，只负责注册登录、页面切换、WebSocket、状态灯和同账号发送按钮（修改影响手机端交互，关联 FLOW_ID：AUTH_REGISTER_001、AUTH_LOGIN_001、PRESENCE_SYNC_001、TEXT_SEND_001）
+static/interaction.js —— 手机端按钮交互辅助脚本，只负责按钮触摸反馈和输入框聚焦辅助（修改影响手机端按钮体验，关联 FLOW_ID：TEXT_SEND_001）
 static/style.css —— 手机端样式文件，只负责登录页、大输入框、发送按钮和状态灯样式（修改影响移动端视觉）

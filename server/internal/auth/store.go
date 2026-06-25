@@ -71,6 +71,7 @@ func (s *Store) newSession(userID string, remember bool) Session {
 	s.mu.Lock()
 	s.sessions[session.Token] = session
 	s.mu.Unlock()
+	_ = s.users.SaveSession(session)
 	return session
 }
 
@@ -83,10 +84,16 @@ func (s *Store) Verify(token string) (Session, bool) {
 
 	session, ok := s.sessions[token]
 	if !ok {
-		return Session{}, false
+		var found bool
+		session, found = s.users.FindSession(token)
+		if !found {
+			return Session{}, false
+		}
+		s.sessions[token] = session
 	}
 	if time.Now().After(session.ExpiresAt) {
 		delete(s.sessions, token)
+		s.users.DeleteSession(token)
 		return Session{}, false
 	}
 	return session, true
@@ -96,6 +103,7 @@ func (s *Store) Logout(token string) {
 	s.mu.Lock()
 	delete(s.sessions, token)
 	s.mu.Unlock()
+	s.users.DeleteSession(token)
 }
 
 func randomToken() string {

@@ -21,6 +21,8 @@ internal/ui/errorlog.go —— 启动错误提示模块，只负责 GUI 启动�
 internal/singleinstance/ —— 单实例模块目录，只负责 Windows 客户端重复启动检测和提示（修改影响客户端启动限制）
 internal/singleinstance/single_instance_windows.go —— Windows 单实例实现，只负责 CreateMutex 互斥锁和重复启动提示框（修改影响 Windows 重复打开行为，关联 FLOW_ID：DESKTOP_TRAY_001）
 internal/singleinstance/single_instance_other.go —— 非 Windows 单实例占位，只负责保持非 Windows 构建兼容（修改影响跨平台构建提示）
+internal/update/ —— 桌面端更新检测目录，只负责读取服务器版本信息和打开下载地址（修改影响客户端升级体验）
+internal/update/checker.go —— 更新检测模块，只负责 desktop-version.json 拉取、版本比较和打开下载链接（修改影响更新提示，关联 FLOW_ID：DESKTOP_UPDATE_001）
 internal/paste/ —— Windows 粘贴模块目录，只负责剪贴板写入和 Ctrl+V 模拟（修改影响自动粘贴）
 internal/paste/paste_windows.go —— Windows 自动粘贴实现，只负责检测输入光标、写剪贴板、SendInput 和恢复剪贴板（修改影响电脑光标处插入，关联 FLOW_ID：TEXT_SEND_001）
 internal/paste/paste_other.go —— 非 Windows 占位实现，只负责阻止非 Windows 构建误用（修改影响跨平台构建提示）

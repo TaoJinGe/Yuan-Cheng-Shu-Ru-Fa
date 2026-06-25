@@ -60,6 +60,9 @@ func (h *Hub) handle(conn *Conn, msg Message) bool {
 	case "send_text":
 		h.sendText(conn, msg)
 		return true
+	case "ping":
+		write(conn, Message{Type: "pong"})
+		return true
 	default:
 		write(conn, AckMessage{Type: "ack", MessageType: msg.Type, OK: false, Error: "unknown message type"})
 		return true
