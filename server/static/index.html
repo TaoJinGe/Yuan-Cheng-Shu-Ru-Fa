@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>远程语音输入</title>
   <link rel="icon" href="./favicon.ico">
-  <link rel="stylesheet" href="./style.css?v=20260626">
+  <link rel="stylesheet" href="./style.css?v=20260631">
 </head>
 <body>
   <main class="page">
@@ -36,18 +36,20 @@
           <span id="statusDot" class="dot red"></span>
           <span id="statusText">未连接</span>
         </div>
-        <button id="logoutButton" class="link-button" type="button">退出</button>
+        <div class="status-actions">
+          <button id="undoButton" class="link-button" type="button">撤销</button>
+          <button id="logoutButton" class="link-button" type="button">退出</button>
+        </div>
       </header>
 
       <textarea id="textInput" class="voice-box" placeholder="点这里，用手机输入法语音转文字"></textarea>
 
       <div class="action-bar">
-        <button id="clearButton" class="clear-button" type="button">清空</button>
         <button id="sendButton" class="send-button" type="button">发送到电脑</button>
       </div>
       <p id="sendHint" class="hint"></p>
     </section>
   </main>
-  <script src="./app.js?v=20260626"></script>
+  <script src="./app.js?v=20260631"></script>
 </body>
 </html>

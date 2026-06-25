@@ -174,9 +174,7 @@ func (w *windowState) setStatus(text string) {
 }
 
 func (w *windowState) setConnected(ok bool) {
-	if ok {
-		w.notify("手机端已连接")
-	}
+	_ = ok
 }
 
 func (w *windowState) authFailed() {
@@ -185,12 +183,6 @@ func (w *windowState) authFailed() {
 		w.status.SetText("登录已过期，请重新登录")
 		w.mw.Show()
 	})
-}
-
-func (w *windowState) notify(text string) {
-	if w.notifyIcon != nil {
-		_ = w.notifyIcon.ShowInfo("远程语音输入", text)
-	}
 }
 
 func (w *windowState) cleanup() {

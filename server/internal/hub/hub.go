@@ -61,7 +61,7 @@ func (h *Hub) handle(conn *Conn, msg Message) bool {
 		h.sendText(conn, msg)
 		return true
 	default:
-		write(conn, AckMessage{Type: "ack", OK: false, Error: "unknown message type"})
+		write(conn, AckMessage{Type: "ack", MessageType: msg.Type, OK: false, Error: "unknown message type"})
 		return true
 	}
 }
@@ -69,7 +69,7 @@ func (h *Hub) handle(conn *Conn, msg Message) bool {
 func (h *Hub) join(conn *Conn, msg Message, kind ClientKind) bool {
 	session, ok := h.sessions.Verify(msg.Token)
 	if !ok {
-		write(conn, AckMessage{Type: "ack", OK: false, Error: "invalid token"})
+		write(conn, AckMessage{Type: "ack", MessageType: msg.Type, OK: false, Error: "invalid token"})
 		return false
 	}
 	h.unregister(conn)
@@ -87,14 +87,14 @@ func (h *Hub) join(conn *Conn, msg Message, kind ClientKind) bool {
 	target[conn.userID][conn] = true
 	h.mu.Unlock()
 
-	write(conn, AckMessage{Type: "ack", OK: true})
+	write(conn, AckMessage{Type: "ack", MessageType: msg.Type, OK: true})
 	h.broadcastPresence(conn.userID)
 	return true
 }
 
 func (h *Hub) sendText(conn *Conn, msg Message) {
 	if conn.userID == "" {
-		write(conn, AckMessage{Type: "ack", OK: false, Error: "not joined"})
+		write(conn, AckMessage{Type: "ack", MessageType: msg.Type, OK: false, Error: "not joined"})
 		return
 	}
 	h.mu.Lock()
@@ -110,7 +110,8 @@ func (h *Hub) sendText(conn *Conn, msg Message) {
 	if h.recorder != nil {
 		_ = h.recorder.Save(conn.userID, msg.Text)
 	}
-	write(conn, AckMessage{Type: "ack", OK: true, Delivered: len(targets) > 0})
+	delivered := len(targets) > 0
+	write(conn, AckMessage{Type: "ack", MessageType: msg.Type, OK: true, Delivered: &delivered})
 }
 
 func (h *Hub) unregister(conn *Conn) {

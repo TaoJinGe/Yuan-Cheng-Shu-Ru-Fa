@@ -76,12 +76,22 @@ button {
   color: #fff;
   background: #146c5c;
   font-weight: 750;
+  box-shadow: 0 6px 14px rgba(20, 108, 92, 0.18);
+  transition: transform 120ms ease, filter 120ms ease, box-shadow 120ms ease;
+  touch-action: manipulation;
 }
 
-.secondary,
-.clear-button {
+button.is-pressing,
+button:active {
+  transform: scale(0.98);
+  filter: brightness(0.94);
+  box-shadow: 0 3px 8px rgba(20, 108, 92, 0.18);
+}
+
+.secondary {
   color: #172026;
   background: #dfe7ea;
+  box-shadow: 0 6px 14px rgba(62, 78, 88, 0.12);
 }
 
 .check {
@@ -98,16 +108,17 @@ button {
 .input-view {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto auto;
-  gap: 12px;
+  gap: 10px;
   height: var(--app-height, 100dvh);
   overflow: hidden;
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  padding: 14px 14px 0;
 }
 
 .status-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   min-height: 38px;
 }
 
@@ -132,12 +143,19 @@ button {
   background: #188b55;
 }
 
+.status-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 .link-button {
   width: auto;
   min-height: 34px;
   padding: 0 10px;
   color: #50606a;
   background: transparent;
+  box-shadow: none;
 }
 
 .voice-box {
@@ -151,6 +169,7 @@ button {
 
 .action-bar {
   display: grid;
+  grid-row: 4;
   grid-template-columns: 1fr !important;
   grid-auto-flow: row;
   grid-auto-rows: auto;
@@ -158,10 +177,11 @@ button {
   position: sticky;
   bottom: 0;
   background: #f9fbfc;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .send-button,
-.clear-button {
+.action-bar button {
   display: block;
   width: 100%;
   min-height: 54px;
@@ -171,9 +191,43 @@ button {
   font-size: 18px;
 }
 
+.send-button.is-flashing {
+  animation: sendFlash 420ms ease;
+}
+
+.link-button.is-flashing {
+  animation: linkFlash 360ms ease;
+}
+
 .hint {
+  grid-row: 3;
   min-height: 22px;
   margin: 0;
   color: #50606a;
   font-size: 14px;
+}
+
+@keyframes sendFlash {
+  0% {
+    background: #146c5c;
+  }
+  45% {
+    background: #1f9c73;
+    box-shadow: 0 0 0 5px rgba(31, 156, 115, 0.16);
+  }
+  100% {
+    background: #146c5c;
+  }
+}
+
+@keyframes linkFlash {
+  0% {
+    background: transparent;
+  }
+  45% {
+    background: rgba(80, 96, 106, 0.12);
+  }
+  100% {
+    background: transparent;
+  }
 }

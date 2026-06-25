@@ -23,8 +23,9 @@ type PresenceMessage struct {
 }
 
 type AckMessage struct {
-	Type      string `json:"type"`
-	OK        bool   `json:"ok"`
-	Delivered bool   `json:"delivered"`
-	Error     string `json:"error,omitempty"`
+	Type        string `json:"type"`
+	MessageType string `json:"message_type,omitempty"`
+	OK          bool   `json:"ok"`
+	Delivered   *bool  `json:"delivered,omitempty"`
+	Error       string `json:"error,omitempty"`
 }
