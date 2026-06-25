@@ -62,6 +62,7 @@ func PasteText(text string, restoreDelay time.Duration) error {
 	if err := writeClipboardText(text); err != nil {
 		return err
 	}
+	time.Sleep(120 * time.Millisecond)
 	sendCtrlV()
 	if previous != "" && restoreDelay > 0 {
 		time.Sleep(restoreDelay)
@@ -125,8 +126,14 @@ func writeClipboardText(text string) error {
 }
 
 func open() bool {
-	ok, _, _ := openClipboard.Call(0)
-	return ok != 0
+	for i := 0; i < 8; i++ {
+		ok, _, _ := openClipboard.Call(0)
+		if ok != 0 {
+			return true
+		}
+		time.Sleep(25 * time.Millisecond)
+	}
+	return false
 }
 
 func sendCtrlV() {

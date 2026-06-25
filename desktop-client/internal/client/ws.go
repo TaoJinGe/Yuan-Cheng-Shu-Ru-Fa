@@ -83,10 +83,11 @@ func runOnce(serverURL, token string, events Events, stop <-chan struct{}) error
 			handlePresence(raw, events)
 		case "insert_text":
 			text, _ := raw["text"].(string)
-			if err := paste.PasteText(text, 1500*time.Millisecond); err != nil {
+			callStatus(events, "正在粘贴收到的文字")
+			if err := paste.PasteText(text, 5*time.Second); err != nil {
 				callStatus(events, fmt.Sprintf("自动粘贴失败：%v", err))
 			} else {
-				callStatus(events, "已粘贴收到的文字")
+				callStatus(events, "已发送粘贴指令")
 				call(events.Inserted)
 			}
 		case "ack":

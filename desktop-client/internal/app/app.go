@@ -73,6 +73,10 @@ func (s *State) StartSocket(events client.Events) {
 	}()
 }
 
+func (s *State) Reconnect(events client.Events) {
+	s.StartSocket(events)
+}
+
 func (s *State) StopSocket() {
 	s.mu.Lock()
 	defer s.mu.Unlock()

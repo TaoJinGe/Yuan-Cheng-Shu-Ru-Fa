@@ -94,6 +94,7 @@ func (w *windowState) build() error {
 						OnClicked: w.login,
 					},
 					PushButton{Text: "注册", MinSize: Size{Height: 38}, OnClicked: w.register},
+					PushButton{Text: "重连", MinSize: Size{Height: 38}, OnClicked: w.reconnect},
 					PushButton{Text: "退出登录", MinSize: Size{Height: 38}, OnClicked: w.logout},
 					PushButton{Text: "检查更新", MinSize: Size{Height: 38}, OnClicked: func() {
 						w.checkUpdate(true)
@@ -163,6 +164,14 @@ func (w *windowState) afterLogin() {
 		Connected:  w.setConnected,
 		AuthFailed: w.authFailed,
 	})
+}
+
+func (w *windowState) reconnect() {
+	if !w.app.Config().Valid() {
+		w.setStatus("请先登录")
+		return
+	}
+	w.afterLogin()
 }
 
 func (w *windowState) checkUpdate(manual bool) {

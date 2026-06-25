@@ -1,5 +1,5 @@
 {
-  "version": "1.1.2",
+  "version": "1.1.4",
   "downloadUrl": "https://srf.cccz.cc/download/voice-bridge-client.exe",
-  "notes": "新增桌面端手动检查更新按钮，发现新版后可从服务器下载。"
+  "notes": "恢复稳定的 Ctrl+V 模拟方式，修复无法发送粘贴按键的问题。"
 }
