@@ -49,25 +49,56 @@ func (w *windowState) build() error {
 	if err := (MainWindow{
 		AssignTo: &w.mw,
 		Title:    "远程语音输入",
-		MinSize:  Size{Width: 360, Height: 310},
-		Layout:   VBox{MarginsZero: false, Spacing: 10},
+		Size:     Size{Width: 420, Height: 360},
+		MinSize:  Size{Width: 390, Height: 340},
+		Font:     Font{Family: "Microsoft YaHei UI", PointSize: 10},
+		Layout:   VBox{Margins: Margins{Left: 18, Top: 16, Right: 18, Bottom: 16}, Spacing: 9},
 		Children: []Widget{
-			Label{Text: "服务器 WebSocket 地址"},
-			LineEdit{AssignTo: &w.serverEdit},
-			Label{Text: "账号"},
-			LineEdit{AssignTo: &w.userEdit},
-			Label{Text: "密码"},
-			LineEdit{AssignTo: &w.passEdit, PasswordMode: true},
-			CheckBox{AssignTo: &w.remember, Text: "30 天免登录", Checked: true},
+			Label{
+				Text:      "远程语音输入",
+				Font:      Font{Family: "Microsoft YaHei UI", PointSize: 13, Bold: true},
+				MinSize:   Size{Height: 24},
+				TextColor: walk.RGB(23, 32, 38),
+			},
+			Label{Text: "服务器 WebSocket 地址", TextColor: walk.RGB(80, 96, 106)},
+			LineEdit{
+				AssignTo:  &w.serverEdit,
+				CueBanner: "wss://srf.cccz.cc/ws",
+				MinSize:   Size{Height: 34},
+			},
+			Label{Text: "账号", TextColor: walk.RGB(80, 96, 106)},
+			LineEdit{
+				AssignTo:  &w.userEdit,
+				CueBanner: "请输入账号",
+				MinSize:   Size{Height: 34},
+			},
+			Label{Text: "密码", TextColor: walk.RGB(80, 96, 106)},
+			LineEdit{
+				AssignTo:     &w.passEdit,
+				PasswordMode: true,
+				CueBanner:    "请输入密码",
+				MinSize:      Size{Height: 34},
+			},
+			CheckBox{AssignTo: &w.remember, Text: "30 天免登录", Checked: true, MinSize: Size{Height: 28}},
 			Composite{
-				Layout: HBox{MarginsZero: true},
+				Layout: HBox{MarginsZero: true, Spacing: 8},
 				Children: []Widget{
-					PushButton{AssignTo: &w.loginBtn, Text: "登录", OnClicked: w.login},
-					PushButton{Text: "注册", OnClicked: w.register},
-					PushButton{Text: "退出登录", OnClicked: w.logout},
+					PushButton{
+						AssignTo:  &w.loginBtn,
+						Text:      "登录",
+						MinSize:   Size{Height: 38},
+						OnClicked: w.login,
+					},
+					PushButton{Text: "注册", MinSize: Size{Height: 38}, OnClicked: w.register},
+					PushButton{Text: "退出登录", MinSize: Size{Height: 38}, OnClicked: w.logout},
 				},
 			},
-			Label{AssignTo: &w.status, Text: "未登录"},
+			Label{
+				AssignTo:  &w.status,
+				Text:      "未登录",
+				MinSize:   Size{Height: 30},
+				TextColor: walk.RGB(20, 108, 92),
+			},
 		},
 	}).Create(); err != nil {
 		return err
@@ -93,6 +124,11 @@ func (w *windowState) register() {
 }
 
 func (w *windowState) doAuth(register bool) {
+	if register {
+		w.setStatus("正在注册...")
+	} else {
+		w.setStatus("正在登录...")
+	}
 	input := app.LoginInput{
 		ServerURL: w.serverEdit.Text(),
 		Username:  w.userEdit.Text(),
@@ -111,7 +147,6 @@ func (w *windowState) doAuth(register bool) {
 	}
 	w.passEdit.SetText("")
 	w.afterLogin()
-	w.mw.Hide()
 }
 
 func (w *windowState) afterLogin() {
@@ -119,7 +154,6 @@ func (w *windowState) afterLogin() {
 	w.app.StartSocket(client.Events{
 		Status:     w.setStatus,
 		Connected:  w.setConnected,
-		Inserted:   func() { w.notify("已粘贴收到的文字") },
 		AuthFailed: w.authFailed,
 	})
 }

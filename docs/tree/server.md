@@ -8,8 +8,8 @@ internal/config/config.go —— 配置读取模块，只负责解析 flag 与�
 internal/auth/ —— 登录会话模块目录，只负责账号认证和 token 生命周期管理（修改影响认证状态，关联 FLOW_ID：AUTH_REGISTER_001、AUTH_LOGIN_001、AUTH_LOGOUT_001）
 internal/auth/store.go —— 认证编排模块，只负责注册、登录、token 签发、校验和吊销（修改影响登录有效期）
 internal/auth/users.go —— SQLite 用户存储模块，只负责 app.db 用户表初始化、写入和账号查询（修改影响账号持久化，关联 FLOW_ID：AUTH_REGISTER_001、AUTH_LOGIN_001）
-internal/records/ —— 文本记录目录，只负责按账号和时间保存手机发送内容（修改影响发送记录）
-internal/records/recorder.go —— 文本记录模块，只负责 records/账号/时间.md 文件写入（修改影响发送记录，关联 FLOW_ID：TEXT_SEND_001）
+internal/records/ —— 文本记录目录，只负责按账号和日期保存手机发送内容（修改影响发送记录）
+internal/records/recorder.go —— 文本记录模块，只负责 records/账号/日期.md 文件追加写入并按发送时间分段（修改影响发送记录，关联 FLOW_ID：TEXT_SEND_001）
 internal/hub/ —— WebSocket Hub 模块目录，只负责在线连接集合、presence 广播和文本转发（修改影响状态灯和发送链路，关联 FLOW_ID：PRESENCE_SYNC_001、TEXT_SEND_001）
 internal/hub/message.go —— WebSocket 消息结构定义，只负责端到端消息协议（修改影响前后端消息兼容）
 internal/hub/hub.go —— 在线连接 Hub，只负责连接注册、断开、状态计算和房间转发（修改影响实时状态）

@@ -12,6 +12,12 @@ const $ = (id) => document.getElementById(id);
 const isFilePreview = location.protocol === "file:";
 
 function init() {
+  updateViewportHeight();
+  window.addEventListener("resize", updateViewportHeight);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", updateViewportHeight);
+    window.visualViewport.addEventListener("scroll", updateViewportHeight);
+  }
   $("loginButton").addEventListener("click", login);
   $("registerButton").addEventListener("click", registerAccount);
   $("logoutButton").addEventListener("click", logout);
@@ -31,6 +37,11 @@ function init() {
   } else {
     showLogin();
   }
+}
+
+function updateViewportHeight() {
+  const height = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  document.documentElement.style.setProperty("--app-height", `${Math.round(height)}px`);
 }
 
 function hasValidToken() {

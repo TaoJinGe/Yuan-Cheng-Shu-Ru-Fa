@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>远程语音输入</title>
   <link rel="icon" href="./favicon.ico">
-  <link rel="stylesheet" href="./style.css?v=20260624">
+  <link rel="stylesheet" href="./style.css?v=20260626">
 </head>
 <body>
   <main class="page">
@@ -41,11 +41,13 @@
 
       <textarea id="textInput" class="voice-box" placeholder="点这里，用手机输入法语音转文字"></textarea>
 
-      <button id="sendButton" class="send-button" type="button">发送到电脑</button>
-      <button id="clearButton" class="clear-button" type="button">清空</button>
+      <div class="action-bar">
+        <button id="clearButton" class="clear-button" type="button">清空</button>
+        <button id="sendButton" class="send-button" type="button">发送到电脑</button>
+      </div>
       <p id="sendHint" class="hint"></p>
     </section>
   </main>
-  <script src="./app.js?v=20260624"></script>
+  <script src="./app.js?v=20260626"></script>
 </body>
 </html>

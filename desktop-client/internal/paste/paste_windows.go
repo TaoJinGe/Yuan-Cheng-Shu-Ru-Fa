@@ -55,8 +55,8 @@ type guiThreadInfo struct {
 }
 
 func PasteText(text string, restoreDelay time.Duration) error {
-	if !inputCaretActive() {
-		return fmt.Errorf("当前电脑没有检测到输入光标，已忽略")
+	if !foregroundWindowExists() {
+		return fmt.Errorf("当前电脑没有活动窗口，已忽略")
 	}
 	previous, _ := readClipboardText()
 	if err := writeClipboardText(text); err != nil {
@@ -134,6 +134,11 @@ func sendCtrlV() {
 	keybdEvent.Call(vkV, 0, 0, 0)
 	keybdEvent.Call(vkV, 0, keyEventUp, 0)
 	keybdEvent.Call(vkControl, 0, keyEventUp, 0)
+}
+
+func foregroundWindowExists() bool {
+	fg, _, _ := getForegroundWindow.Call()
+	return fg != 0
 }
 
 func inputCaretActive() bool {

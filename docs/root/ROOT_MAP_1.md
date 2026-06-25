@@ -11,7 +11,7 @@
 /server/internal/config/ —— 服务端配置目录，负责命令行参数与环境变量读取（修改影响启动配置）
 /server/internal/auth/ —— 服务端认证目录，负责 SQLite 账号注册、密码哈希、token 签发、校验和失效（修改影响登录态）
 /server/internal/hub/ —— 服务端 WebSocket Hub 目录，负责同账号转发和设备在线状态（修改影响消息中转与状态灯）
-/server/internal/records/ —— 服务端文本记录目录，负责按账号和时间保存手机发送内容（修改影响发送记录）
+/server/internal/records/ —— 服务端文本记录目录，负责按账号和日期追加保存手机发送内容（修改影响发送记录）
 /server/internal/web/ —— 服务端 HTTP 目录，负责登录 API、健康检查、静态页和 WebSocket 入口（修改影响 HTTP/API 入口）
 /server/static/ —— 手机网页静态资源目录，负责移动端登录、状态灯和发送交互（修改影响手机端 UI 与交互）
 /desktop-client/ —— Windows 电脑客户端目录，负责登录、常驻 WebSocket、剪贴板写入和 Ctrl+V（修改影响桌面端体验）

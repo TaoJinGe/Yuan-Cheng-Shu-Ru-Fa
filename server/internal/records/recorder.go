@@ -5,12 +5,14 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 	"unicode"
 )
 
 type Recorder struct {
 	root string
+	mu   sync.Mutex
 }
 
 func New(root string) *Recorder {
@@ -26,9 +28,30 @@ func (r *Recorder) Save(username, text string) error {
 		return err
 	}
 	now := time.Now()
-	name := now.Format("2006-01-02_15-04-05.000") + ".md"
-	content := fmt.Sprintf("# %s\n\n%s\n", now.Format(time.RFC3339), text)
-	return os.WriteFile(filepath.Join(dir, name), []byte(content), 0600)
+	name := now.Format("2006-01-02") + ".md"
+	path := filepath.Join(dir, name)
+	entry := fmt.Sprintf("## %s\n\n%s\n\n---\n\n", now.Format("15:04:05"), text)
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	info, err := file.Stat()
+	if err != nil {
+		return err
+	}
+	if info.Size() == 0 {
+		if _, err := fmt.Fprintf(file, "# %s\n\n", now.Format("2006-01-02")); err != nil {
+			return err
+		}
+	}
+	_, err = file.WriteString(entry)
+	return err
 }
 
 func safeName(value string) string {
